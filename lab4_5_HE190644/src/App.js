@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card, CardBody, CardFooter, CardHeader, CardText, CardTitle } from "react-bootstrap";
+import { Routes, Route, useNavigate,Navigate } from "react-router-dom";
+import CourseDetail from "./CourseDetail";
 
-function App() {
+function CourseList() {
     const [courses, setCourses] = useState([]);
     const [searchCourse, setSearchCourse] = useState("");
     const [semester, setSemester] = useState("");
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCourses = async () => {
@@ -32,13 +36,16 @@ function App() {
 
         return matchSearch && matchSemester;
     });
+
     return (
-        <div>
+        <div className="container-fluid">
+
             <div>Courses Projects Review Title Confirmation Reference</div>
 
             {/* Filter */}
             <div className="row mb-4 align-items-end">
 
+                {/* Search */}
                 <div className="col-md-3">
                     <h5>Welcome back, Lecturer</h5>
                     <h3>My Courses</h3>
@@ -48,9 +55,10 @@ function App() {
                         className="form-control"
                         placeholder="Search courses..."
                         value={searchCourse}
-                        onChange={(e) => setSearchCourse(e.target.value)} />
+                        onChange={(e) => setSearchCourse(e.target.value)}/>
                 </div>
 
+                {/* Semester + Refresh */}
                 <div className="col-md-3">
                     <div className="d-flex gap-2">
 
@@ -58,11 +66,10 @@ function App() {
                             className="form-select"
                             value={semester}
                             onChange={(e) => setSemester(e.target.value)}>
+
                             <option value="">All Semesters</option>
 
-                            {[...new Set(
-                                filteredCourses.map((course) => course.semester)
-                            )].map((item) => (
+                            {[...new Set(courses.map((course) => course.semester))].map((item) => (
                                 <option key={item} value={item}>
                                     {item}
                                 </option>
@@ -74,8 +81,7 @@ function App() {
                             onClick={() => {
                                 setSearchCourse("");
                                 setSemester("");
-                            }}>
-                            Refresh
+                            }}>Refresh
                         </button>
                     </div>
                 </div>
@@ -85,8 +91,8 @@ function App() {
             <div className="row">
                 {filteredCourses.map((course) => (
                     <div className="col-md-3 mb-3" key={course.id}>
-                        <Card className="h-100 d-flex flex-column">
 
+                        <Card className="h-100 d-flex flex-column">
                             <CardHeader>
                                 <div className="d-flex justify-content-between align-items-center">
                                     <span>{course.badge}</span>
@@ -111,7 +117,12 @@ function App() {
                             <CardFooter className="mt-auto">
                                 <div className="d-flex justify-content-between align-items-center">
                                     <span>&rarr; Get started</span>
-                                    <span>&rarr;</span>
+
+                                    <button
+                                        className="btn btn-link text-decoration-none p-0"
+                                        onClick={() => navigate(`/detail/${course.id}`)}>
+                                        &rarr;
+                                    </button>
                                 </div>
                             </CardFooter>
 
@@ -120,6 +131,16 @@ function App() {
                 ))}
             </div>
         </div>
+    );
+}
+
+function App() {
+    return (
+        <Routes>
+            <Route path="/" element={<Navigate to="/courses" replace />} />
+            <Route path="/courses" element={<CourseList />} />
+            <Route path="/detail/:id" element={<CourseDetail />} />
+        </Routes>
     );
 }
 
